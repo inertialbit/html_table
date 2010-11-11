@@ -15,7 +15,7 @@ module HtmlTable
     end
 
     def table_body(collection, options={})
-      return unless defined?(@formatter)      
+      return unless defined?(@formatter)
       content_tag(:tbody) do
         collection.map do |obj|
           data_row(obj) + action_row(obj, options)
@@ -35,24 +35,25 @@ module HtmlTable
         content_tag(:td, {
           :colspan => @formatter.columns.size - 1
         }) do
-          # todo factor these blocks into a method
           management_link_methods.map do |m, opts|
             next if opts[:blacklisted] || opts[:options][:method] == 'delete'
-            text = opts[:text] ? opts[:text] : m.to_s.gsub(/_(path|url)/, '')
-            text = text.humanize.downcase
-            path = opts[:use_obj] ? send(m, obj) : send(m)
-            link_to(text, path, opts[:options])
+            management_link_to(m, opts)
           end.compact.sort{|s1, s2| s1[0] <=> s2[0]}.join(" ") + " " +
-        
+          
+          # todo do this w/out iterating over all members
           management_link_methods.map do |m, opts|
             next if opts[:options][:method] != 'delete'
-            text = opts[:text] ? opts[:text] : m.to_s.gsub(/_(path|url)/, '')
-            text = text.humanize.downcase
-            path = opts[:use_obj] ? send(m, obj) : send(m)
-            link_to(text, path, opts[:options])
+            management_link_to(m, opts)
           end.compact.join(" ")
         end
       end
+    end
+    
+    def management_link_to(path_helper_name, options={})
+      text = options[:text] ? options[:text] : m.to_s.gsub(/_(path|url)/, '')
+      text = text.humanize.downcase
+      path = options[:use_obj] ? send(m, obj) : send(m)
+      link_to(text, path, options[:options])
     end
   
     def data_row(obj)
@@ -89,7 +90,9 @@ module HtmlTable
   
     def format_collection(collection=[])
       # todo support custom display of collections
-      #s = collection.compact.map(&:name).join("; ")
+      unless collection.empty? || collection.first.respond_to?(:name)
+        raise ArgumentError, "Collection objects must respond to :name"
+      end
       s = collection.compact.map do |item|
         link_to(item.name, polymorphic_path(item))
       end.join("; ")

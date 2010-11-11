@@ -4,7 +4,6 @@ require 'acts_as_fu'
 RSpec.configure do |config|
   config.include ActsAsFu
 end
-
 describe HtmlTable::Formatter do
   before(:each) do
     build_model :fake_object do
