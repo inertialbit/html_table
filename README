@@ -32,4 +32,50 @@ Links to actions can also be blacklisted eg:
   }
 }
 
+<%=raw html_table_for(@groups, {
+  :blacklist => ['Groups','Registered Memberships'],
+  :column_map => {
+    :memberships => { # maps Group#memberships association to use Group#members instead
+      :column_name => 'Memberships', # keeps Memberships as the html column name
+      :method => :members
+    },
+    :name => {
+      :column_name => 'Group' # use Group instead of Name as the html column name
+    }
+  },
+  :table_options => {
+    :class => 'nice_table tablesorter'
+  },
+  :table_body_options => {
+    :management_link_methods => {
+      :new_group_membership_path => { # name of the path helper to build the link
+        :blacklisted => false, # authz check
+        :use_obj => true, # whether or not to pass the object from collection to the path helper
+        :text => 'add members',
+        :options => { # html options hash passed straight to #link_to
+          :class => 'fake_button'
+        }
+      },
+      :edit_group_path => {
+        :blacklisted => false, # authz check
+        :use_obj => true,
+        :options => {
+          :class => 'fake_button'
+        }
+      },
+      :group_path => {
+        :blacklisted => false, # authz check
+        :use_obj => true,
+        :text => 'delete',
+        :options => {
+          :class => 'fake_button',
+          :method => 'delete', # setup std rails delete link
+          :confirm => 'Are you sure you want to delete this group?'
+        }
+      }
+    }
+  }  
+}) %>
+
+
 Copyright (c) 2010 [Jeremiah Heller], released under the MIT license
