@@ -34,6 +34,7 @@ module HtmlTable
       #   merge_new_column_options(column_name)
       # end
     
+      # todo allow for columns to be sorted according to an :order opt
       @columns = @column_options.keys #.sort!
     end
   

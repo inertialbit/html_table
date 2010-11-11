@@ -33,26 +33,27 @@ module HtmlTable
       }) do
         content_tag(:td, nil) +
         content_tag(:td, {
+          # todo add check to ensure columns.size > 0
           :colspan => @formatter.columns.size - 1
         }) do
           management_link_methods.map do |m, opts|
             next if opts[:blacklisted] || opts[:options][:method] == 'delete'
-            management_link_to(m, opts)
+            management_link_to(m, obj, opts)
           end.compact.sort{|s1, s2| s1[0] <=> s2[0]}.join(" ") + " " +
           
           # todo do this w/out iterating over all members
           management_link_methods.map do |m, opts|
             next if opts[:options][:method] != 'delete'
-            management_link_to(m, opts)
+            management_link_to(m, obj, opts)
           end.compact.join(" ")
         end
       end
     end
     
-    def management_link_to(path_helper_name, options={})
-      text = options[:text] ? options[:text] : m.to_s.gsub(/_(path|url)/, '')
+    def management_link_to(path_helper_name, obj, options={})
+      text = options[:text] ? options[:text] : path_helper_name.to_s.gsub(/_(path|url)/, '')
       text = text.humanize.downcase
-      path = options[:use_obj] ? send(m, obj) : send(m)
+      path = options[:use_obj] ? send(path_helper_name, obj) : send(path_helper_name)
       link_to(text, path, options[:options])
     end
   
@@ -90,6 +91,8 @@ module HtmlTable
   
     def format_collection(collection=[])
       # todo support custom display of collections
+        # link_to obj, mail_to addy, plain text display
+        # specify item method used for display
       unless collection.empty? || collection.first.respond_to?(:name)
         raise ArgumentError, "Collection objects must respond to :name"
       end
