@@ -1,0 +1,35 @@
+HtmlTable
+=========
+
+A HtmlTable plugin that should easily tie in w/ authz routines (eg cancan).
+
+It has 1 class & module: Formatter and Helpers.
+
+Helpers provides #html_table_for and takes a collection and options hash as its only args.
+
+Table columns must be based on db columns or AR associations/aggregations right now but translating eg Name => Group or Children => Sub-Groups is possible and by default any protected attributes are not shown in html ('id','type' by def. for all objects).
+Using the Reflections module from Rails I was able to get a list of associations/aggregations.
+
+Todo
+====
+
+test Helpers module
+add the ability to add custom table columns
+? get management links to show in own column
+
+Example
+=======
+
+Columns can be blacklisted when html_table_for is called, eg: 
+:blacklist => ['Groups','Registered Memberships'].
+
+Links to actions can also be blacklisted eg:
+:edit_group_path => {
+  :blacklisted => false, # can? :update, Group
+  :use_obj => true,
+  :options => {
+     :class => 'fake_button'
+  }
+}
+
+Copyright (c) 2010 [Jeremiah Heller], released under the MIT license
